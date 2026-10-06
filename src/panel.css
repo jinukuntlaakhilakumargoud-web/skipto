@@ -1,0 +1,76 @@
+.skipto {
+  --sk-card: #ffffff; --sk-card2: #f6f6f8; --sk-fg: #0f0f0f; --sk-muted: #606060; --sk-line: #e2e2e8;
+  --sk-amber: #ffb800; --sk-amber-ink: #8a5a00; --sk-amber-soft: rgba(255, 184, 0, .14); --sk-good: #0b8043; --sk-warn: #b06000; --sk-bad: #c5221f;
+  --sk-bar: #d6d6de;
+  font-family: "Roboto", "Segoe UI", Arial, sans-serif;
+  color: var(--sk-fg);
+  background: var(--sk-card);
+  border: 1px solid var(--sk-line);
+  border-radius: 16px;
+  padding: 16px 18px;
+  margin: 12px 0 16px;
+  font-size: 14px;
+  line-height: 1.4;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+html[dark] .skipto {
+  --sk-card: #15151b; --sk-card2: #1c1c24; --sk-fg: #f4f4f6; --sk-muted: #9a9aa8; --sk-line: #2a2a35;
+  --sk-amber-ink: #ffb800; --sk-good: #6fdba4; --sk-warn: #fdd663; --sk-bad: #f28b82; --sk-bar: #3a3a48;
+}
+.skipto-floating { position: fixed; right: 16px; bottom: 16px; width: 440px; max-width: calc(100vw - 32px); z-index: 9999; box-shadow: 0 12px 32px rgba(0, 0, 0, .35); }
+
+.skipto-form { display: flex; gap: 10px; align-items: center; }
+.skipto-logo { flex: none; width: 34px; height: 34px; border-radius: 9px; background: var(--sk-amber); display: grid; place-items: center; }
+.skipto-logo svg { width: 20px; height: 20px; fill: #111; }
+.skipto-input {
+  flex: 1; min-width: 0; font: inherit; font-size: 15px; color: var(--sk-fg); background: transparent;
+  border: 1px solid var(--sk-line); border-radius: 22px; padding: 9px 16px; outline: none;
+}
+.skipto-input:focus { border-color: var(--sk-amber); }
+.skipto-go, .skipto-link {
+  font: inherit; font-size: 15px; font-weight: 700; border: 0; border-radius: 22px; padding: 9px 20px; cursor: pointer;
+  background: var(--sk-amber); color: #111;
+}
+.skipto-go:disabled { opacity: .6; cursor: progress; }
+.skipto-link { padding: 5px 14px; font-size: 13px; }
+
+.skipto-out:empty { display: none; }
+.skipto-out { display: flex; flex-direction: column; gap: 10px; }
+.skipto-status, .skipto-meta { color: var(--sk-muted); margin: 0 2px; font-size: 13px; }
+.skipto-meta { font-size: 12px; }
+.skipto-error { color: var(--sk-bad); margin: 0 2px; }
+.skipto-verdict { font-size: 16px; font-weight: 700; margin: 0 2px; }
+.skipto-verdict small { color: var(--sk-muted); font-weight: 500; font-size: 13px; }
+.skipto-found { color: var(--sk-good); }
+.skipto-partial { color: var(--sk-warn); }
+.skipto-absent { color: var(--sk-muted); }
+
+.skipto-chart { background: var(--sk-card2); border: 1px solid var(--sk-line); border-radius: 12px; padding: 10px 12px 8px; }
+.skipto-chart-head { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; color: var(--sk-muted); margin-bottom: 8px; }
+.skipto-chart-head b { color: var(--sk-fg); font-weight: 600; }
+.skipto-bars { display: flex; align-items: flex-end; gap: 1px; height: 56px; }
+.skipto-bars span { flex: 1; min-width: 1px; border-radius: 2px 2px 0 0; background: var(--sk-bar); cursor: pointer; }
+.skipto-bars span.warm { background: rgba(255, 184, 0, .5); }
+.skipto-bars span.hot { background: var(--sk-amber); box-shadow: 0 0 12px rgba(255, 184, 0, .6); }
+.skipto-axis { display: flex; justify-content: space-between; font-size: 11px; color: var(--sk-muted); margin-top: 4px; font-variant-numeric: tabular-nums; }
+
+.skipto-moments { display: flex; flex-direction: column; gap: 6px; }
+.skipto-moment {
+  display: grid; grid-template-columns: 64px 1fr 48px; gap: 12px; align-items: center; text-align: left;
+  font: inherit; font-size: 14px; color: var(--sk-fg); background: transparent; border: 1px solid var(--sk-line); border-radius: 10px;
+  padding: 8px 12px; cursor: pointer;
+}
+.skipto-moment:hover, .skipto-moment:focus-visible { border-color: var(--sk-amber); outline: none; }
+.skipto-moment:first-child { border-color: var(--sk-amber); background: var(--sk-amber-soft); }
+.skipto-time { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--sk-amber-ink); }
+.skipto-text { color: var(--sk-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.skipto-p { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.skipto-heat { position: absolute; left: 0; right: 0; bottom: 100%; height: 6px; margin-bottom: 3px; border-radius: 3px; pointer-events: none; z-index: 40; }
+.skipto-tip {
+  position: absolute; bottom: 12px; transform: translateX(-50%); background: var(--sk-amber, #ffb800); color: #111;
+  font: 700 12px/1 "Roboto", Arial, sans-serif; padding: 4px 8px; border-radius: 6px; white-space: nowrap;
+}
+.skipto-tip::after { content: ""; position: absolute; left: 50%; top: 100%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: #ffb800; }

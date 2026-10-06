@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skipto settings</title>
+<style>
+  :root { --bg: #f9f9f9; --panel: #fff; --fg: #0f0f0f; --muted: #606060; --line: #e5e5e5; --accent: #ffb800; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #0f0f0f; --panel: #212121; --fg: #f1f1f1; --muted: #aaa; --line: #3f3f3f; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 Roboto, Arial, sans-serif; }
+  main { max-width: 520px; margin: 48px auto; padding: 24px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  p { color: var(--muted); margin: 0 0 20px; }
+  label { display: block; font-size: 13px; font-weight: 500; margin: 14px 0 6px; }
+  input { width: 100%; font: inherit; color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; }
+  input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  small { display: block; color: var(--muted); margin-top: 4px; }
+  button { margin-top: 20px; font: inherit; font-weight: 500; border: 0; border-radius: 20px; padding: 9px 20px; background: var(--accent); color: #0f0f0f; cursor: pointer; }
+  #saved { margin-left: 10px; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Skipto settings</h1>
+  <p>Your key stays in this browser and is sent only to the API address below.</p>
+  <form id="form">
+    <label for="key">API key</label>
+    <input id="key" type="password" autocomplete="off" required>
+    <small>Create one at console.typesafe.ai.</small>
+    <label for="baseURL">API address</label>
+    <input id="baseURL" type="url" placeholder="https://api.typesafe.ai">
+    <small>Leave empty for TypeSafe. Any server that speaks the same API works, such as a local open model.</small>
+    <label for="model">Model</label>
+    <input id="model" type="text" placeholder="jev-latest">
+    <button type="submit">Save</button><span id="saved" role="status"></span>
+  </form>
+</main>
+<script src="options.js"></script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+node_modules/
+.DS_Store
+# LinkedIn post assets (the image uses illustrative numbers)
+docs/linkedin-image.html
+docs/skipto-linkedin.png
