@@ -27,8 +27,13 @@ request has a context budget. A strong answer in one part of the video outranks 
 
 1. Clone or download this repository.
 2. Open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked**, and choose this folder.
-3. Click the Skipto icon and paste a TypeSafe API key (create one at [console.typesafe.ai](https://console.typesafe.ai)).
-4. Open any YouTube video that has a transcript and ask away.
+3. Open any YouTube video that has a transcript and ask away.
+4. For smarter answers, click the Skipto icon and paste a TypeSafe API key (create one at [console.typesafe.ai](https://console.typesafe.ai)).
+
+**No key?** Skipto still works. Without a key it ranks the windows with free keyword search (BM25)
+right in your browser: same panel, chart and jump, but it matches words rather than meaning, so
+"how do they train it?" won't find a section that only says "pre-training". Add a Jev key and the
+same question is answered by meaning, with calibrated probabilities.
 
 Your key stays in the browser's extension storage and is sent only to the API address in Skipto's
 settings.

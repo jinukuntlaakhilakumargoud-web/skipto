@@ -101,8 +101,9 @@
     const box = el("div", "skipto-chart");
     const head = el("div", "skipto-chart-head");
     const title = el("span");
-    title.append(el("b", null, "Jev's answer"), ` · probability for each of ${result.heat.length} windows`);
-    head.append(title, el("span", null, `${result.requests} call${result.requests > 1 ? "s" : ""} · ${result.requests * 2} questions`));
+    title.append(el("b", null, result.offline ? "Keyword match" : "Jev's answer"), ` · score for each of ${result.heat.length} windows`);
+    const calls = `${result.requests} call${result.requests > 1 ? "s" : ""} · ${result.requests * 2} questions`;
+    head.append(title, el("span", null, result.offline ? "free · runs in your browser" : calls));
     const bars = el("div", "skipto-bars");
     const max = Math.max(...result.heat.map((h) => h.p)) || 1;
     const top = result.top[0];
@@ -138,8 +139,16 @@
       b.onclick = () => seek(m.start);
       list.append(b);
     }
-    const cost = (result.tokens * 0.042e-6).toFixed(5);
-    const meta = el("p", "skipto-meta", `${result.ms} ms · ${result.tokens.toLocaleString()} tokens (≈ $${cost}) · ${result.model}`);
+    const meta = el("p", "skipto-meta");
+    if (result.offline) {
+      const link = el("button", "skipto-link", "Add a Jev key for smarter answers");
+      link.type = "button";
+      link.onclick = () => chrome.runtime.sendMessage({ type: "settings" });
+      meta.append(`Offline keyword mode · ${result.ms} ms · matches words, not meaning `, link);
+    } else {
+      const cost = (result.tokens * 0.042e-6).toFixed(5);
+      meta.append(`${result.ms} ms · ${result.tokens.toLocaleString()} tokens (≈ $${cost}) · ${result.model}`);
+    }
     out.append(verdict, chart(result), list, meta);
     paintHeat(result, best);
     if (result.verdict === "found") seek(best.start);
@@ -152,12 +161,7 @@
       const events = await readTranscript();
       out.replaceChildren(el("p", "skipto-status", "Finding the moment…"));
       const result = await chrome.runtime.sendMessage({ type: "ask", question, events });
-      if (result.error === "NO_KEY") {
-        const link = el("button", "skipto-link", "Add your API key");
-        link.type = "button";
-        link.onclick = () => chrome.runtime.sendMessage({ type: "settings" });
-        out.replaceChildren(el("p", "skipto-status", "One-time setup: "), link);
-      } else if (result.error) {
+      if (result.error) {
         out.replaceChildren(el("p", "skipto-error", result.error));
       } else {
         render(out, result);

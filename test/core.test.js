@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { ABSENT, FOUND, MAX_OPTIONS, chunks, clock, combine, id, request, windows } from "../src/core.js";
+import { ABSENT, FOUND, MAX_OPTIONS, chunks, clock, combine, id, offline, request, windows } from "../src/core.js";
 
 const ev = (start, text, dur = 4) => ({ start, dur, text });
 
@@ -58,4 +58,21 @@ test("a confident chunk outranks a weak chunk's best guess", () => {
   assert.equal(res.top[0].start, 600);
   assert.equal(res.requests, 2);
   assert.equal(res.tokens, 2000);
+});
+
+test("offline mode ranks the window that uses the question's words", () => {
+  const part = [
+    { start: 0, end: 30, text: "welcome everyone, today we talk about large language models" },
+    { start: 30, end: 60, text: "a jailbreak attack tricks the model into ignoring its safety rules" },
+    { start: 60, end: 90, text: "thanks for watching and see you next time" },
+  ];
+  const res = combine([part], offline([part], "What is a jailbreak attack?"));
+  assert.equal(res.top[0].start, 30);
+  assert.equal(res.verdict, "found");
+  assert.equal(res.model, "offline keyword search");
+});
+
+test("offline mode says absent when no word matches", () => {
+  const part = [{ start: 0, end: 30, text: "cooking pasta with tomatoes" }, { start: 30, end: 60, text: "boiling water first" }];
+  assert.equal(combine([part], offline([part], "How do rockets reach orbit?")).verdict, "absent");
 });

@@ -12,6 +12,12 @@ export const ABSENT = 0.35;
 
 export const id = (i) => "W" + String(i).padStart(3, "0");
 
+const STOP = new Set(("about after also and any are because been but can could did does doing from had has have here how "
+  + "into its just more most not now off once only other our out over own same she should some such than that the their "
+  + "them then there these they this those through too under until very was were what when where which while who whom "
+  + "why will with would you your").split(" "));
+const terms = (s) => (s.toLowerCase().match(/[a-z0-9]+/g) || []).filter((w) => w.length > 2 && !STOP.has(w));
+
 export function clock(seconds) {
   const s = Math.floor(seconds);
   const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = String(s % 60).padStart(2, "0");
@@ -96,4 +102,37 @@ export function combine(parts, responses) {
     requests: responses.length,
     tokens,
   };
+}
+
+// Free fallback when no API key is set: BM25 keyword ranking, returned in the same answer shape as
+// Jev so nothing downstream changes. It matches words, not meaning, and its numbers aren't calibrated.
+export function offline(parts, question) {
+  const query = [...new Set(terms(question))];
+  const docs = parts.flat().map((w) => terms(w.text));
+  const avg = docs.reduce((a, d) => a + d.length, 0) / (docs.length || 1) || 1;
+  const idf = Object.fromEntries(query.map((t) => {
+    const df = docs.filter((d) => d.includes(t)).length;
+    return [t, Math.log(1 + (docs.length - df + 0.5) / (df + 0.5))];
+  }));
+  const bm25 = (d) => query.reduce((s, t) => {
+    const f = d.filter((x) => x === t).length;
+    return s + (idf[t] * f * 2.2) / (f + 1.2 * (0.25 + (0.75 * d.length) / avg));
+  }, 0);
+
+  let k = 0;
+  return parts.map((part) => {
+    const mine = part.map(() => docs[k++]);
+    const sharp = mine.map((d) => bm25(d) ** 2); // squaring sharpens the peak, like a confident Choice
+    const sum = sharp.reduce((a, b) => a + b, 0);
+    const best = mine[sharp.indexOf(Math.max(...sharp))] || [];
+    const share = query.length ? query.filter((t) => best.includes(t)).length / query.length : 0;
+    return {
+      model: "offline keyword search",
+      usage: { input_tokens: 0 },
+      answers: {
+        where: { probabilities: Object.fromEntries(part.map((_, i) => [id(i), sum ? sharp[i] / sum : 1 / part.length])) },
+        covered: { noul: !sum ? 0.05 : share >= 0.6 ? 0.8 : share >= 0.3 ? 0.5 : 0.2 },
+      },
+    };
+  });
 }
