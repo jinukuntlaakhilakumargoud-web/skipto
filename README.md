@@ -31,8 +31,11 @@ request has a context budget. A strong answer in one part of the video outranks 
 4. Open any YouTube video that has a transcript and ask away.
 
 Your key stays in the browser's extension storage and is sent only to the API address in Skipto's
-settings. Any server that speaks the same `/v1/systemone` API works, including a local open model:
-set its address and model name in the settings.
+settings.
+
+No TypeSafe credit? Jev is also served by Vercel's AI Gateway, which includes free monthly credit.
+Use a Vercel AI Gateway key, set the API address to `https://ai-gateway.vercel.sh/typesafe` and the
+model to `typesafe-ai/jev`. Any other server that speaks the same `/v1/systemone` API works too.
 
 ## Cost
 

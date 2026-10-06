@@ -39,6 +39,7 @@
   ],
   "host_permissions": [
     "https://api.typesafe.ai/*",
+    "https://ai-gateway.vercel.sh/*",
     "https://openrouter.ai/*",
     "http://localhost/*",
     "http://127.0.0.1/*"
