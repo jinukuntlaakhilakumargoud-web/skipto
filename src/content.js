@@ -42,7 +42,7 @@
     return box;
   }
 
-  async function readTranscript() {
+  async function readTranscript(status) {
     const v = new URL(location.href).searchParams.get("v");
     if (cache.has(v)) return cache.get(v);
     const show = document.querySelector("ytd-video-description-transcript-section-renderer button");
@@ -51,12 +51,19 @@
     const wasOpen = document.querySelector(TRANSCRIPT_PANEL)?.getAttribute("visibility") === "ENGAGEMENT_PANEL_VISIBILITY_EXPANDED";
     if (!wasOpen) show.click();
     const length = duration();
-    let rows = [];
-    for (let i = 0; i < 80; i++) { // up to ~12 s; the panel loads lazily
+    let rows = [], hidden;
+    // YouTube only loads the transcript while the tab is on screen, so time spent hidden doesn't count
+    // toward the ~12 s limit, and the panel says why it's waiting.
+    for (let waited = 0; waited < 12_000; ) {
       rows = [...(document.querySelector(TRANSCRIPT_PANEL)?.querySelectorAll("ytd-transcript-segment-renderer") ?? [])];
       const last = rows.at(-1)?.querySelector(".segment-timestamp")?.textContent;
       if (rows.length && last && seconds(last) <= length + 30) break; // ignore a previous video's transcript
       rows = [];
+      if (hidden !== document.hidden) {
+        hidden = document.hidden;
+        status(hidden ? "Waiting for this tab to be on screen (YouTube only loads transcripts while visible)…" : "Reading the transcript…");
+      }
+      if (!hidden) waited += 150;
       await sleep(150);
     }
     if (!wasOpen) document.querySelector(TRANSCRIPT_PANEL)?.querySelector("#visibility-button button")?.click();
@@ -156,9 +163,10 @@
 
   async function ask(question, out, button) {
     button.disabled = true;
-    out.replaceChildren(el("p", "skipto-status", "Reading the transcript…"));
+    const status = (text) => out.replaceChildren(el("p", "skipto-status", text));
+    status("Reading the transcript…");
     try {
-      const events = await readTranscript();
+      const events = await readTranscript(status);
       out.replaceChildren(el("p", "skipto-status", "Finding the moment…"));
       const result = await chrome.runtime.sendMessage({ type: "ask", question, events });
       if (result.error) {
